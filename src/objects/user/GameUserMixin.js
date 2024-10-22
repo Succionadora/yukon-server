@@ -138,8 +138,8 @@ const GameUserMixin = {
         }
     },
 
-    async addSystemMail(postcardId, details = null) {
-        const postcard = await this.postcards.add(null, postcardId, details)
+    async addSystemMail(postcardId, details = null, date = new Date()) {
+        const postcard = await this.postcards.add(null, postcardId, details, date)
 
         if (postcard) this.send('receive_mail', postcard)
 
@@ -175,6 +175,39 @@ const GameUserMixin = {
 
             this.walkingPet.walking = false
             this.walkingPet = null
+        }
+    },
+
+    sendPaychecks() {
+        if (!this.lastLogin) return
+
+        const today = new Date()
+        let nextDate = this.lastLogin
+
+        let payment = 0
+
+        while (nextDate <= today) {
+            nextDate = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 1)
+
+            if (nextDate > today) {
+                break
+            }
+
+            // Secret Agent
+            if (this.inventory.includes(800)) {
+                payment += 250
+                this.addSystemMail(171, null, nextDate)
+            }
+
+            // Tour Guide
+            if (this.inventory.includes(428)) {
+                payment += 250
+                this.addSystemMail(172, null, nextDate)
+            }
+        }
+
+        if (payment > 0) {
+            this.updateCoins(payment)
         }
     },
 
@@ -280,6 +313,7 @@ const GameUserMixin = {
             'id',
             'username',
             'joinTime',
+            'lastLogin',
             'head',
             'face',
             'neck',
