@@ -1,4 +1,5 @@
 {
+	"use_envs": "true",
 	"crypto": {
 		"secret": "${SECRET}",
 		"rounds": 10,

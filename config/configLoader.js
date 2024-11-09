@@ -4,25 +4,34 @@ const fs = require("fs")
 const path = require("path")
 
 function loadConfig() {
-	const configPath = path.join(__dirname, "config.json")
-	let configContent = fs.readFileSync(configPath, "utf8")
+  const configPath = path.join(__dirname, "config.json")
+  let configContent = fs.readFileSync(configPath, "utf8")
 
-	// Replace placeholders with environment variables
-	configContent = configContent.replace(/\$\{(\w+)\}/g, (match, p1) => {
-		const envVar = process.env[p1]
-		if (envVar === undefined) {
-			throw new Error(`Environment variable ${p1} is not defined`)
-		}
-		return envVar
-	})
+  // Extract "use_envs" value before parsing
+  let useEnvsMatch = configContent.match(/"use_envs"\s*:\s*"(\w+)"/)
+  let useEnvs = false
+  if (useEnvsMatch && useEnvsMatch[1]) {
+    useEnvs = useEnvsMatch[1] === "true"
+  }
 
-	// Parse the JSON content
-	const config = JSON.parse(configContent)
+  if (useEnvs) {
+    // Replace placeholders with environment variables
+    configContent = configContent.replace(/\$\{(\w+)\}/g, (match, p1) => {
+      const envVar = process.env[p1]
+      if (envVar === undefined) {
+        throw new Error(`Environment variable ${p1} is not defined`)
+      }
+      return envVar
+    })
+  }
 
-	// Ensure boolean and number values are correctly parsed
-	config.socketio.https = config.socketio.https === "true"
+  // Parse the JSON content
+  const config = JSON.parse(configContent)
 
-	return config
+  // Ensure boolean and number values are correctly parsed
+  config.socketio.https = config.socketio.https === "true"
+
+  return config
 }
 
 module.exports = loadConfig()
