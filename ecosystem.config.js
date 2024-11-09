@@ -1,6 +1,5 @@
 const config = require('./config/configLoader.js')
 
-console.log('config', config)
 
 let apps = Object.keys(config.worlds).map(world => {
     return {
