@@ -4,6 +4,23 @@ Visit the Discord server for more support.
 
 [![Yukon Discord members](https://badgen.net/discord/members/NtYtpzyxBu)](https://discord.gg/NtYtpzyxBu)
 
+## Table of Contents
+- [Built With](#built-with)
+- [Local Installation](#local-installation)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Account Creation](#account-creation)
+- [Production Usage](#production-usage)
+- [Running with Docker](#running-with-docker)
+  - [Prerequisites](#docker-prerequisites)
+  - [Steps](#docker-steps)
+  - [Production Readiness with Docker](#production-readiness-with-docker)
+- [Configuration Details](#configuration-details)
+  - [Using Environment Variables](#using-environment-variables)
+  - [Using Hardcoded Values (Without Environment Variables)](#using-hardcoded-values-without-environment-variables)
+- [Disclaimer](#disclaimer)
+
 ## Built With
 
 * [Node.js](https://nodejs.org/en/)
@@ -22,142 +39,304 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Installation
 
-1. Clone this repository.
+1. **Clone this repository.**
 
-```console
-git clone https://github.com/wizguin/yukon-server
-```
+   ```console
+   git clone https://github.com/wizguin/yukon-server
+   ```
 
-2. Install node dependencies.
+2. **Install node dependencies.**
 
-```console
-npm install
-```
+   ```console
+   npm install
+   ```
 
-3. Copy "config_example.json" to a new file called "config.json".
+3. **Copy `config/config_example.json` to a new file called `config/config.json`.**
 
-4. Generate a new crypto secret.
+   ```console
+   cp config/config_example.json config/config.json
+   ```
 
-```console
-npm run secret-gen
-```
+4. **Set configuration values in `config.json` if not using environment variables.**
 
-5. Import yukon.sql into your MySQL database.
+   By default, `config.json` uses placeholders like `${SECRET}` to enable dynamic values from environment variables. If you prefer hardcoded values, replace all placeholders with your actual configuration values.
 
-6. Update MySQL database credentials.
+   Example:
 
-```json
-"database": {
-    "host": "localhost",
-    "user": "user",
-    "password": "password",
-    "database": "yukon",
-    "dialect": "mysql",
-    "debug": false
-},
-```
+   ```json
+   {
+     "crypto": {
+       "secret": "your-secret-key",
+       "rounds": 10,
+       "loginKeyExpiry": 300
+     },
+     "database": {
+       "host": "localhost",
+       "user": "your-database-user",
+       "password": "your-database-password",
+       "database": "yukon",
+       "dialect": "mysql",
+       "debug": false
+     },
+     // ... rest of the configuration
+   }
+   ```
+
+   **Note:** Replace `"your-secret-key"`, `"your-database-user"`, and `"your-database-password"` with your actual values.
+
+5. **Generate a new crypto secret.**
+
+   If you prefer to generate a new secret:
+
+   ```console
+   npm run secret-gen
+   ```
+
+6. **Import `yukon.sql` into your MySQL database.**
+
 
 ### Usage
 
-* Running the dev server.
+* **Running the dev server.**
 
-```console
-npm run dev
+  ```console
+  npm run dev
+  ```
+
+* **Building the server for production.**
+
+  ```console
+  npm run build
+  ```
+
+* **Running the server in production mode.** This will start all worlds listed in `config.json`.
+
+  ```console
+  npm run start
+  ```
+
+* **Stopping production servers.**
+
+  ```console
+  npm run stop
+  ```
+
+* **Restarting production servers.**
+
+  ```console
+  npm run restart
+  ```
+
+* **Listing production servers.**
+
+  ```console
+  npm run list
+  ```
+
+* **Display live logs for production servers**
+
+  ```console
+  npm run logs
+  ```
+
+* **PM2 monitor for production servers.**
+
+  ```console
+  npm run monit
+  ```
+
+* **Generate a new crypto secret.**
+
+  ```console
+  npm run secret-gen
+  ```
+
+### Account Creation
+
+In order to access with the first user, run this query on your database:
+
+```sql
+INSERT INTO `users` (
+  `id`, `username`, `email`, `password`, `loginKey`, `rank`, `permaBan`, `joinTime`,
+  `coins`, `head`, `face`, `neck`, `body`, `hand`, `feet`, `color`, `photo`, `flag`,
+  `ninjaRank`, `ninjaProgress`
+) VALUES (
+  NULL,                    -- 'id' (NULL if auto-incremented)
+  'your_username',         -- 'username'
+  'email@example.com',     -- 'email'
+  'password_hash',         -- 'password' (use a secure bcrypt hash)
+  NULL,                    -- 'loginKey'
+  1,                       -- 'rank' (1 for default)
+  0,                       -- 'permaBan' (0 for default)
+  CURRENT_TIMESTAMP,       -- 'joinTime'
+  500,                     -- 'coins' (500 as default)
+  0,                       -- 'head'
+  0,                       -- 'face'
+  0,                       -- 'neck'
+  0,                       -- 'body'
+  0,                       -- 'hand'
+  0,                       -- 'feet'
+  1,                       -- 'color'
+  0,                       -- 'photo'
+  0,                       -- 'flag'
+  0,                       -- 'ninjaRank'
+  0                        -- 'ninjaProgress'
+);
 ```
 
-* Building the server for production.
+**Note:** Ensure you replace `'your_username'`, `'email@example.com'`, and `'password_hash'` with your actual username, email, and a bcrypt hashed password. A tool such as [this](https://www.browserling.com/tools/bcrypt) can be used to generate a bcrypt hash.
 
-```console
-npm run build
-```
-
-* Running the server in production mode. This will start all worlds listed in config.json.
-
-```console
-npm run start
-```
-
-* Stopping production servers.
-
-```console
-npm run stop
-```
-
-* Restarting production servers.
-
-```console
-npm run restart
-```
-
-* Listing production servers.
-
-```console
-npm run list
-```
-
-* Display live logs for production servers
-
-```console
-npm run logs
-```
-
-* PM2 monitor for production servers.
-
-```console
-npm run monit
-```
-
-* Generate a new crypto secret.
-
-```console
-npm run secret-gen
-```
-
-### Account creation
-
-The easiest way to create accounts locally would be to simply enter them manually. Make sure to use a bcrypt hashed password, a tool such as [this](https://www.browserling.com/tools/bcrypt) can be used to generate one.
+Example bcrypt hash:
 
 ```console
 $2a$10$nAxC5GXU0i/dacalTX.iZuRrtpmwmZ9ZzL.U3Zroh0jeSXiswFsne
 ```
 
+Once your server is up and running and the first user is created, you can check the system’s functionality and start exploring features on the [Yukon GitHub repository](https://github.com/wizguin/yukon) for expected server behavior.
+
 ## Production Usage
 
 The following is required when running the project in production.
 
-* The project must first be built using the build command.
+* **Build the project for production.**
 
-```console
-npm run build
-```
+  ```console
+  npm run build
+  ```
 
-* HTTPS can be configured as follows. Make sure your web server is also configured to use HTTPS.
+* **Configure HTTPS (mandatory).** Make sure your web server is also configured to use HTTPS.
 
-```console
-"socketio": {
-    "https": true,
-    "ssl": {
-        "cert": "/path/to/cert.crt",
-        "ca": "/path/to/ca.ca-bundle",
-        "key": "/path/to/key.key"
-    }
-},
-```
+  ```json
+  "socketio": {
+      "https": true,
+      "ssl": {
+          "cert": "/path/to/cert.crt",
+          "ca": "/path/to/ca.ca-bundle",
+          "key": "/path/to/key.key"
+      }
+  },
+  ```
 
-* The CORS origin must be set. This will likely just be your domain name, e.g "example.com".
+* **Set the CORS origin.** This will likely be your domain name, e.g., `"example.com"`.
 
-```console
-"cors": {
-    "origin": "example.com"
-},
-```
+  ```json
+  "cors": {
+      "origin": "example.com"
+  },
+  ```
 
-* Run the server in production mode.
+* **Run the server in production mode.**
 
-```console
-npm run start
-```
+  ```console
+  npm run start
+  ```
+
+## Running with Docker
+
+To simplify deployment and ensure a consistent environment, the Yukon Server can be run using Docker. This setup uses Docker Compose to manage services, including a MySQL database and an optional phpMyAdmin service for database management.
+
+### Prerequisites
+
+Ensure Docker and Docker Compose are installed on your machine. You can download them from:
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Steps
+
+1. **Clone the Repository**
+
+   ```console
+   git clone https://github.com/wizguin/yukon-server
+   cd yukon-server
+   ```
+
+2. **Build and Start Services with Docker Compose**
+
+   Run the following command to build the Docker image and start all services defined in `compose.yml` (MySQL, Yukon Server, and phpMyAdmin). The application will use environment variables defined in `compose.yml`.
+
+   ```console
+   docker compose up -d --build
+   ```
+
+3. **Access the Application**
+
+   - **Yukon Server**: The Yukon client will be accessible at `http://localhost:8080` and will forward requests to the Yukon server.
+   - **phpMyAdmin**: Access phpMyAdmin (optional) at `http://localhost:8081`. Use the MySQL credentials defined in `compose.yml`.
+
+4. **Stopping Services**
+
+   To stop all services, run:
+
+   ```console
+   docker compose down
+   ```
+
+---
+
+### Production Readiness with Docker
+
+For full production readiness when running with Docker, ensure HTTPS is enabled and SSL certificates are configured correctly:
+
+1. **Set HTTPS Environment Variables in `compose.yml`**
+
+   Configure the following environment variables for the `server` service in `compose.yml` to enable HTTPS:
+
+   ```yaml
+   USE_ENVS: 'true'         # Enables use of environment variables in config.json
+   SOCKETIO_HTTPS: 'true'   # Enables HTTPS in the application
+   CERTS_DIR: /certs        # Directory where SSL certificates are stored in the container
+   SSL_CERT_PATH: /certs/cert.crt
+   SSL_CA_PATH: /certs/ca.ca-bundle
+   SSL_KEY_PATH: /certs/key.key
+   ```
+
+2. **Prepare SSL Certificate Files**
+
+   Ensure the following files are available in a `certs` folder in your project root:
+
+   - `certs/cert.crt` - SSL certificate file
+   - `certs/ca.ca-bundle` - CA bundle file
+   - `certs/key.key` - Private key file
+
+   These files will be mounted to the `/certs` directory in the container. This setup is required for HTTPS configuration in production.
+
+3. **Update the `compose.yml` Volume Mount**
+
+   Ensure `compose.yml` includes a volume to mount the `certs` directory to the `/certs` path in the container:
+
+   ```yaml
+   volumes:
+     - ./certs:/certs:ro  # Mounts the certs directory as read-only
+   ```
+
+4. **Run the Server in Production Mode**
+
+   After setting up HTTPS and SSL certificates, you can run the server in production mode using Docker.
+
+
+---
+
+## Configuration Details
+
+### Using Environment Variables
+
+The application supports configuration via environment variables for flexibility, especially when running in Docker or other containerized environments.
+
+- **Enable Environment Variables:**
+
+  Set `USE_ENVS=true` in your environment or in `compose.yml`. 
+
+- **Placeholders in `config.json`:**
+
+  Use placeholders like `${ENV_VAR_NAME}` in your configuration. These will be replaced by the corresponding environment variables at runtime.
+
+### Using Hardcoded Values (Without Environment Variables)
+
+If `USE_ENVS` is not set, the application will default to using the hardcoded values directly from `config.json`. This respects the original contract for non-Docker setups and static configurations.
+
+---
 
 ## Disclaimer
 
-This project is a work in progress, please report any issues you find [here](https://github.com/wizguin/yukon-server/issues).
+This project is a work in progress. Please report any issues you find [here](https://github.com/wizguin/yukon-server/issues).
