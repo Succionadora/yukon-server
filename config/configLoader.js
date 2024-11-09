@@ -7,12 +7,8 @@ function loadConfig() {
   const configPath = path.join(__dirname, "config.json")
   let configContent = fs.readFileSync(configPath, "utf8")
 
-  // Extract "use_envs" value before parsing
-  let useEnvsMatch = configContent.match(/"use_envs"\s*:\s*"(\w+)"/)
-  let useEnvs = false
-  if (useEnvsMatch && useEnvsMatch[1]) {
-    useEnvs = useEnvsMatch[1] === "true"
-  }
+  // Check if USE_ENVS environment variable is set to "true"
+  const useEnvs = process.env.USE_ENVS === "true"
 
   if (useEnvs) {
     // Replace placeholders with environment variables

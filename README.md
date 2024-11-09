@@ -57,18 +57,14 @@ These instructions will get you a copy of the project up and running on your loc
    cp config/config_example.json config/config.json
    ```
 
-4. **Set `"use_envs"` to `"false"` and replace placeholders with your actual configuration values.**
+4. **Set configuration values in `config.json` if not using environment variables.**
 
-   Open `config/config.json` and make the following changes:
-
-   - Set `"use_envs": "false"`.
-   - Replace all placeholders like `${SECRET}` with your actual configuration values.
+   By default, `config.json` uses placeholders like `${SECRET}` to enable dynamic values from environment variables. If you prefer hardcoded values, replace all placeholders with your actual configuration values.
 
    Example:
 
    ```json
    {
-     "use_envs": "false",
      "crypto": {
        "secret": "your-secret-key",
        "rounds": 10,
@@ -86,7 +82,7 @@ These instructions will get you a copy of the project up and running on your loc
    }
    ```
 
-   **Note:** Make sure to replace `"your-secret-key"`, `"your-database-user"`, and `"your-database-password"` with your actual values.
+   **Note:** Replace `"your-secret-key"`, `"your-database-user"`, and `"your-database-password"` with your actual values.
 
 5. **Generate a new crypto secret.**
 
@@ -253,7 +249,6 @@ Ensure Docker and Docker Compose are installed on your machine. You can download
    cd yukon-server
    ```
 
-
 2. **Build and Start Services with Docker Compose**
 
    Run the following command to build the Docker image and start all services defined in `compose.yml` (MySQL, Yukon Server, and phpMyAdmin). The application will use environment variables defined in `compose.yml`.
@@ -286,8 +281,9 @@ For full production readiness when running with Docker, ensure HTTPS is enabled 
    Configure the following environment variables for the `server` service in `compose.yml` to enable HTTPS:
 
    ```yaml
-   SOCKETIO_HTTPS: 'true'  # Enables HTTPS in the application
-   CERTS_DIR: /certs       # Directory where SSL certificates are stored in the container
+   USE_ENVS: 'true'         # Enables use of environment variables in config.json
+   SOCKETIO_HTTPS: 'true'   # Enables HTTPS in the application
+   CERTS_DIR: /certs        # Directory where SSL certificates are stored in the container
    SSL_CERT_PATH: /certs/cert.crt
    SSL_CA_PATH: /certs/ca.ca-bundle
    SSL_KEY_PATH: /certs/key.key
@@ -327,11 +323,7 @@ The application supports configuration via environment variables for flexibility
 
 - **Enable Environment Variables:**
 
-  In `config/config.json`, is set by default:
-
-  ```json
-  "use_envs": "true",
-  ```
+  Set `USE_ENVS=true` in your environment or in `compose.yml`. 
 
 - **Placeholders in `config.json`:**
 
@@ -339,19 +331,7 @@ The application supports configuration via environment variables for flexibility
 
 ### Using Hardcoded Values (Without Environment Variables)
 
-If you're running the application without Docker or prefer to use hardcoded configuration values:
-
-- **Disable Environment Variables:**
-
-  In `config/config.json`, set:
-
-  ```json
-  "use_envs": "false",
-  ```
-
-- **Replace Placeholders:**
-
-  Replace all placeholders in `config.json` with your actual configuration values.
+If `USE_ENVS` is not set, the application will default to using the hardcoded values directly from `config.json`. This respects the original contract for non-Docker setups and static configurations.
 
 ---
 
