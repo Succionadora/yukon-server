@@ -192,6 +192,8 @@ Example bcrypt hash:
 $2a$10$nAxC5GXU0i/dacalTX.iZuRrtpmwmZ9ZzL.U3Zroh0jeSXiswFsne
 ```
 
+Once your server is up and running and the first user is created, you can check the system’s functionality and start exploring features on the [Yukon GitHub repository](https://github.com/wizguin/yukon) for expected server behavior.
+
 ## Production Usage
 
 The following is required when running the project in production.
