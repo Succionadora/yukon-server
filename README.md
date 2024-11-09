@@ -4,6 +4,23 @@ Visit the Discord server for more support.
 
 [![Yukon Discord members](https://badgen.net/discord/members/NtYtpzyxBu)](https://discord.gg/NtYtpzyxBu)
 
+## Table of Contents
+- [Built With](#built-with)
+- [Local Installation](#local-installation)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Account Creation](#account-creation)
+- [Production Usage](#production-usage)
+- [Running with Docker](#running-with-docker)
+  - [Prerequisites](#docker-prerequisites)
+  - [Steps](#docker-steps)
+  - [Production Readiness with Docker](#production-readiness-with-docker)
+- [Configuration Details](#configuration-details)
+  - [Using Environment Variables](#using-environment-variables)
+  - [Using Hardcoded Values (Without Environment Variables)](#using-hardcoded-values-without-environment-variables)
+- [Disclaimer](#disclaimer)
+
 ## Built With
 
 * [Node.js](https://nodejs.org/en/)
