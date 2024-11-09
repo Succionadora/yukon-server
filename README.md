@@ -34,7 +34,7 @@ git clone https://github.com/wizguin/yukon-server
 npm install
 ```
 
-3. Copy "config_example.json" to a new file called "config.json".
+3. Copy "config/config_example.json" to a new file called "config/config.json".
 
 4. Generate a new crypto secret.
 
@@ -114,6 +114,37 @@ npm run secret-gen
 ```
 
 ### Account creation
+
+In order to access with the first user, run this query on DB:
+
+```sql
+INSERT INTO `users` (
+  `id`, `username`, `email`, `password`, `loginKey`, `rank`, `permaBan`, `joinTime`,
+  `coins`, `head`, `face`, `neck`, `body`, `hand`, `feet`, `color`, `photo`, `flag`,
+  `ninjaRank`, `ninjaProgress`
+) VALUES (
+  NULL,                    -- 'id' (NULL si es autoincremental o se generará automáticamente)
+  'mi_usuario',            -- 'username'
+  'correo@ejemplo.com',    -- 'email'
+  'contraseña_hash',       -- 'password' (asegúrate de usar un hash seguro en bycript)
+  NULL,                    -- 'loginKey'
+  1,                       -- 'rank' (1 para el valor por defecto)
+  0,                       -- 'permaBan' (0 para el valor por defecto)
+  CURRENT_TIMESTAMP,       -- 'joinTime'
+  500,                     -- 'coins' (500 como valor por defecto)
+  0,                       -- 'head'
+  0,                       -- 'face'
+  0,                       -- 'neck'
+  0,                       -- 'body'
+  0,                       -- 'hand'
+  0,                       -- 'feet'
+  1,                       -- 'color'
+  0,                       -- 'photo'
+  0,                       -- 'flag'
+  0,                       -- 'ninjaRank'
+  0                        -- 'ninjaProgress'
+);
+```
 
 The easiest way to create accounts locally would be to simply enter them manually. Make sure to use a bcrypt hashed password, a tool such as [this](https://www.browserling.com/tools/bcrypt) can be used to generate one.
 
