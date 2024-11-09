@@ -1,0 +1,64 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: yukon
+      MYSQL_USER: yukonuser
+      MYSQL_PASSWORD: yukonpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./yukon.sql:/docker-entrypoint-initdb.d/yukon.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - server-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: rootpassword
+    networks:
+      - server-network
+
+  server:
+    build: .
+    container_name: yukon-server
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080" # proxy server port
+      - "6111:6111" # login world server port
+      - "6112:6112" # blizzard world server port
+    environment:
+      # Database environment variables
+      DATABASE_HOST: mysql
+      DATABASE_USER: yukonuser
+      DATABASE_PASSWORD: yukonpassword
+      DATABASE_NAME: yukon
+      # Other environment variables
+      SECRET: your-secret-key
+      SOCKETIO_HTTPS: 'false'
+      CORS_ORIGIN: http://localhost:8080
+    networks:
+      - server-network
+
+networks:
+  server-network:
+
+volumes:
+  mysql_data:
