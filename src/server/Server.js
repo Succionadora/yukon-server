@@ -34,7 +34,12 @@ export default class Server {
     createLimiter(points, duration = 1) {
         return new RateLimiterFlexible.RateLimiterMemory({
             points: points,
-            duration: duration
+            duration: duration,
+            blockDuration: 60, // Block for 1 minute if limit exceeded
+            keyGenerator: (key) => {
+                // Sanitize the key to prevent potential DoS attacks
+                return String(key).replace(/[^a-zA-Z0-9.-]/g, '');
+            }
         })
     }
 
@@ -74,8 +79,11 @@ export default class Server {
             .then(() => {
                 this.initUser(socket)
             })
-            .catch(() => {
+            .catch((error) => {
+                console.log(`[${this.id}] Rate limit exceeded for address: ${address}`)
                 socket.disconnect(true)
+                // Send a message to the client explaining why they were disconnected
+                socket.emit('error', { message: 'Too many connection attempts. Please try again later.' })
             })
     }
 
