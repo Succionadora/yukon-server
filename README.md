@@ -18,14 +18,14 @@ These instructions will get you a copy of the project up and running on your loc
 
 * [A MySQL database](https://www.mysql.com/)
 * [Node.js](https://nodejs.org/en/)
-* [yukon](https://github.com/wizguin/yukon)
+* [yukon](https://github.com/Succionadora/yukon-client)
 
 ### Installation
 
 1. Clone this repository.
 
 ```console
-git clone https://github.com/wizguin/yukon-server
+git clone https://github.com/succionadora/yukon-server
 ```
 
 2. Install node dependencies.
